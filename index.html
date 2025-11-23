@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Generator - Professional Resume Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        /* Header Section */
+        .header {
+            text-align: center;
+            color: white;
+            padding: 60px 20px 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Templates Grid */
+        .templates-section {
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+        
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .template-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .template-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .template-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .template-description {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .template-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .template-features li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .template-features li::before {
+            content: '✓';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .template-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .template-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .template-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            opacity: 0.9;
+        }
+        
+        .footer-links {
+            margin-top: 20px;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Coming Soon Overlay */
+        .coming-soon {
+            position: relative;
+        }
+        
+        .coming-soon::after {
+            content: 'COMING SOON';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 10;
+        }
+        
+        .coming-soon .template-btn {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo { font-size: 36px; }
+            .tagline { font-size: 24px; }
+            .subtitle { font-size: 16px; }
+            .templates-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">📄 CV Generator</div>
+            <div class="tagline">Make your CV with single click</div>
+            <div class="subtitle">
+                Choose from our professional templates and create a stunning resume in minutes. 
+                ATS-friendly, customizable, and ready to impress employers.
+            </div>
+        </div>
+        
+        <!-- Templates Section -->
+        <div class="templates-section">
+            <div class="section-title">Choose Your Template</div>
+            
+            <div class="templates-grid">
+                <!-- Professional CV Generator -->
+                <div class="template-card">
+                    <span class="template-badge">MOST POPULAR</span>
+                    <span class="template-icon">🎯</span>
+                    <div class="template-name">Professional CV Builder</div>
+                    <div class="template-description">
+                        Create a comprehensive, professional CV with full customization. Perfect for experienced professionals and fresh graduates.
+                    </div>
+                    <ul class="template-features">
+                        <li>Multiple color themes</li>
+                        <li>Education suggestions (40+ degrees)</li>
+                        <li>Skills & certifications sections</li>
+                        <li>Multi-page support</li>
+                        <li>Live preview</li>
+                        <li>Document border options</li>
+                    </ul>
+                    <a href="
+cv_generator_1.html" class="template-btn"; return false;">Open Builder</a>
+                </div>
+                
+                <!-- Quick Form CV -->
+                <div class="template-card coming-soon">
+                    <span class="template-badge">COMING SOON</span>
+                    <span class="template-icon">⚡</span>
+                    <div class="template-name">Quick Form CV</div>
+                    <div class="template-description">
+                        Speed through CV creation with pre-defined sections and smart auto-fill. Get your CV ready in under 5 minutes.
+                    </div>
+                    <ul class="template-features">
+                        <li>Pre-filled sections</li>
+                        <li>Smart field positioning</li>
+                        <li>One-page format</li>
+                        <li>Instant PDF generation</li>
+                        <li>Mobile-friendly</li>
+                    </ul>
+                    <button class="template-btn" disabled>Coming Soon</button>
+                </div>
+                
+                <!-- Modern Minimalist -->
+                <div class="template-card coming-soon">
+                    <span class="template-badge">COMING SOON</span>
+                    <span class="template-icon">✨</span>
+                    <div class="template-name">Modern Minimalist</div>
+                    <div class="template-description">
+                        Clean, elegant design focused on content. Perfect for creative professionals and designers.
+                    </div>
+                    <ul class="template-features">
+                        <li>Minimalist design</li>
+                        <li>Focus on typography</li>
+                        <li>Portfolio showcase</li>
+                        <li>Social media links</li>
+                        <li>Modern aesthetics</li>
+                    </ul>
+                    <button class="template-btn" disabled>Coming Soon</button>
+                </div>
+                
+                <!-- Banking Sector CV -->
+                <div class="template-card coming-soon">
+                    <span class="template-badge">COMING SOON</span>
+                    <span class="template-icon">🏦</span>
+                    <div class="template-name">Banking Sector CV</div>
+                    <div class="template-description">
+                        Specialized template for banking and financial sector jobs. Includes compliance certifications and regulatory training.
+                    </div>
+                    <ul class="template-features">
+                        <li>Banking-specific sections</li>
+                        <li>Regulatory certifications</li>
+                        <li>Compliance training</li>
+                        <li>Professional format</li>
+                        <li>Industry keywords</li>
+                    </ul>
+                    <button class="template-btn" disabled>Coming Soon</button>
+                </div>
+                
+                <!-- Academic CV -->
+                <div class="template-card coming-soon">
+                    <span class="template-badge">COMING SOON</span>
+                    <span class="template-icon">🎓</span>
+                    <div class="template-name">Academic CV</div>
+                    <div class="template-description">
+                        Detailed academic CV for researchers, professors, and PhD candidates. Includes publications and research sections.
+                    </div>
+                    <ul class="template-features">
+                        <li>Publications section</li>
+                        <li>Research experience</li>
+                        <li>Conferences attended</li>
+                        <li>Teaching experience</li>
+                        <li>Grants & awards</li>
+                    </ul>
+                    <button class="template-btn" disabled>Coming Soon</button>
+                </div>
+                
+                <!-- Tech Professional CV -->
+                <div class="template-card coming-soon">
+                    <span class="template-badge">COMING SOON</span>
+                    <span class="template-icon">💻</span>
+                    <div class="template-name">Tech Professional CV</div>
+                    <div class="template-description">
+                        Optimized for IT professionals, software developers, and tech specialists. Highlight your tech stack and projects.
+                    </div>
+                    <ul class="template-features">
+                        <li>Tech stack showcase</li>
+                        <li>GitHub integration</li>
+                        <li>Project highlights</li>
+                        <li>Code portfolio links</li>
+                        <li>Technical certifications</li>
+                    </ul>
+                    <button class="template-btn" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2024 CV Generator. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Us</a>
+                <a href="#" class="footer-link">Help Center</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 14px;">
+                Create professional CVs in minutes • ATS-Friendly • 100% Free
+            </p>
+        </div>
+    </div>
+</body>
+</html>

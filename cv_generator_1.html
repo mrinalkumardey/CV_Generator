@@ -1,0 +1,962 @@
+const skills = document.getElementById('skills').value;
+                if(skills &&<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional CV Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Times New Roman", serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .app-header { text-align: center; margin-bottom: 30px; }
+        .app-header h1 { color: #667eea; font-size: 32px; margin-bottom: 10px; }
+        .app-header p { color: #666; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #e0e0e0; }
+        .tab { padding: 12px 24px; cursor: pointer; border: none; background: transparent; font-size: 16px; color: #666; transition: all 0.3s; }
+        .tab.active { color: #667eea; border-bottom: 3px solid #667eea; font-weight: bold; }
+        .tab:hover { color: #667eea; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header { border-bottom: 4px solid #667eea; padding-bottom: 25px; margin-bottom: 35px; position: relative; }
+        .name { font-size: 36px; font-weight: bold; color: #667eea; text-align: center; margin: 10px 0; outline: none; }
+        .underline { height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); width: 420px; margin: 10px auto; border-radius: 2px; }
+        .contact { text-align: center; font-size: 14px; line-height: 2; color: #333; margin-top: 20px; }
+        .photo { position: absolute; top: 20px; right: 30px; width: 100px; height: 120px; border: 4px solid #667eea; border-radius: 10px; object-fit: cover; }
+        
+        .form-group { margin: 20px 0; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #333; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border 0.3s; font-family: inherit; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #667eea; }
+        textarea { height: 100px; resize: vertical; }
+        
+        .section { margin: 30px 0; background: #f8f9ff; padding: 25px; border-left: 5px solid #667eea; border-radius: 0 10px 10px 0; }
+        .section h2 { color: #667eea; font-size: 20px; margin-bottom: 20px; }
+        
+        .entry { background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0e0e0; position: relative; }
+        .entry input, .entry textarea { margin-bottom: 12px; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #d0d0d0; }
+        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; font-size: 13px; position: absolute; top: 15px; right: 15px; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .main-btn { text-align: center; margin: 50px 0 30px; }
+        .main-btn button { padding: 18px 60px; font-size: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); transition: all 0.3s; display: inline-block; margin: 0 8px; }
+        .main-btn button:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5); }
+        
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
+        #loading.show { display: flex; }
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading p { color: white; font-size: 20px; }
+        
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .setting-card { background: white; padding: 20px; border-radius: 10px; border: 2px solid #e0e0e0; }
+        .setting-card h3 { color: #667eea; margin-bottom: 15px; font-size: 16px; }
+        
+        .template-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .template-card { padding: 20px; border: 3px solid #e0e0e0; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.3s; }
+        .template-card:hover { border-color: #667eea; transform: scale(1.05); }
+        .template-card.selected { border-color: #667eea; background: #f8f9ff; }
+        
+        .feature-badge { display: inline-block; background: #667eea; color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1>Professional CV Generator</h1>
+            <p>Create stunning, ATS-friendly resumes in minutes</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">Content</button>
+            <button class="tab" onclick="switchTab(1)">Design</button>
+            <button class="tab" onclick="switchTab(2)">Preview</button>
+        </div>
+
+        <!-- TAB 1: Content -->
+        <div class="tab-content active">
+            <form id="cvForm">
+                <!-- Personal Info -->
+                <div class="header">
+                    <div class="form-group">
+                        <label>Profile Photo (Optional)</label>
+                        <input type="file" id="photoInput" accept="image/*">
+                        <img id="preview" class="photo" src="" alt="Photo" style="display:none;">
+                    </div>
+
+                    <div class="name" contenteditable="true" id="fullName">Your Full Name</div>
+                    <div class="underline"></div>
+
+                    <div class="contact">
+                        <div class="form-row">
+                            <input type="text" id="address" placeholder="Full Address">
+                            <input type="text" id="phone" placeholder="Phone Number">
+                        </div>
+                        <input type="text" id="email" placeholder="Email Address">
+                    </div>
+                </div>
+
+                <!-- Profile Summary -->
+                <div class="section">
+                    <h2>Profile Summary <span class="feature-badge">NEW</span></h2>
+                    <textarea id="summary" placeholder="Write a compelling 2-3 sentence summary about yourself..."></textarea>
+                </div>
+
+                <!-- Basic Details -->
+                <div class="section">
+                    <h2>Basic Details</h2>
+                    <div class="form-row">
+                        <div><label>Father's Name</label><input type="text" id="father"></div>
+                        <div><label>Mother's Name</label><input type="text" id="mother"></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Date of Birth</label><input type="text" id="dob" placeholder="e.g., 1st January, 1992"></div>
+                        <div><label>Highest Education</label><input type="text" id="highest"></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Available for Relocation</label>
+                            <select id="relocation"><option>Yes</option><option>No</option></select></div>
+                        <div><label>Notice Period</label><input type="text" id="notice" placeholder="e.g., Immediate"></div>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="section">
+                    <h2>Education</h2>
+                    <div id="eduContainer"></div>
+                    <button type="button" class="btn btn-primary" onclick="addEdu()">+ Add Education</button>
+                </div>
+
+                <!-- Experience -->
+                <div class="section">
+                    <h2>Experience</h2>
+                    <div id="expContainer"></div>
+                    <button type="button" class="btn btn-primary" onclick="addExp()">+ Add Experience</button>
+                </div>
+
+                <!-- Skills -->
+                <div class="section">
+                    <h2>Skills</h2>
+                    <textarea id="skills" placeholder="Enter your skills (one per line)"></textarea>
+                </div>
+
+                <!-- Certifications -->
+                <div class="section">
+                    <h2>Certifications <span class="feature-badge">NEW</span></h2>
+                    <div id="certContainer"></div>
+                    <button type="button" class="btn btn-primary" onclick="addCert()">+ Add Certification</button>
+                </div>
+
+                <!-- Languages -->
+                <div class="section">
+                    <h2>Languages <span class="feature-badge">NEW</span></h2>
+                    <textarea id="languages" placeholder="Enter languages (one per line)"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 2: Design Settings -->
+        <div class="tab-content">
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <h3>Color Theme</h3>
+                    <div class="template-selector">
+                        <div class="template-card selected" onclick="setTheme('blue')" data-theme="blue">
+                            <div style="background: #667eea; height: 40px; border-radius: 5px; margin-bottom: 8px;"></div>
+                            <p>Blue</p>
+                        </div>
+                        <div class="template-card" onclick="setTheme('purple')" data-theme="purple">
+                            <div style="background: #764ba2; height: 40px; border-radius: 5px; margin-bottom: 8px;"></div>
+                            <p>Purple</p>
+                        </div>
+                        <div class="template-card" onclick="setTheme('green')" data-theme="green">
+                            <div style="background: #10b981; height: 40px; border-radius: 5px; margin-bottom: 8px;"></div>
+                            <p>Green</p>
+                        </div>
+                        <div class="template-card" onclick="setTheme('red')" data-theme="red">
+                            <div style="background: #ef4444; height: 40px; border-radius: 5px; margin-bottom: 8px;"></div>
+                            <p>Red</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Layout Options</h3>
+                    <label><input type="checkbox" id="showPhoto" checked> Include Photo</label><br>
+                    <label><input type="checkbox" id="showSectionBoxes" checked> Show Section Colored Boxes</label><br>
+                    <label><input type="checkbox" id="showDecoLines" checked> Show Decorative Lines</label><br>
+                    <label><input type="checkbox" id="showShadowEffect"> Enable Shadow Effects</label><br>
+                    <label><input type="checkbox" id="compactMode"> Compact Mode</label>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Document Border</h3>
+                    <select id="docBorder" style="width: 100%; padding: 10px;">
+                        <option value="none">No Border</option>
+                        <option value="simple">Simple Border</option>
+                        <option value="double">Double Border</option>
+                        <option value="thick">Thick Border</option>
+                        <option value="dashed">Dashed Border</option>
+                    </select>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Font Size</h3>
+                    <label>Content: <input type="range" id="fontSize" min="10" max="14" value="12" oninput="this.nextElementSibling.textContent=this.value+'pt'"> <span>12pt</span></label>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Page Style</h3>
+                    <select id="pageStyle" style="width: 100%; padding: 10px;">
+                        <option value="modern">Modern (Current)</option>
+                        <option value="classic">Classic Professional</option>
+                        <option value="minimal">Minimal Clean</option>
+                        <option value="creative">Creative Bold</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Preview -->
+        <div class="tab-content">
+            <div id="previewArea" style="background: white; padding: 40px; border: 1px solid #e0e0e0; border-radius: 10px; min-height: 600px; font-family: 'Times New Roman', serif;">
+                <p style="text-align: center; color: #999; padding: 100px 0;">Click "Preview CV" to see your resume</p>
+            </div>
+        </div>
+
+        <div class="main-btn">
+            <button onclick="showPreview()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Preview CV</button>
+            <button onclick="generatePDF()">Generate PDF</button>
+        </div>
+    </div>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Creating your professional CV...</p>
+    </div>
+
+    <script src="https://unpkg.com/pdf-lib@1.17.0/dist/pdf-lib.min.js"></script>
+    <script>
+        let currentTheme = { primary: [0.4, 0.49, 0.92] };
+        const themes = {
+            blue: { primary: [0.4, 0.49, 0.92] },
+            purple: { primary: [0.46, 0.29, 0.64] },
+            green: { primary: [0.06, 0.73, 0.51] },
+            red: { primary: [0.94, 0.27, 0.27] }
+        };
+
+        function switchTab(index) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.tab-content').forEach((c, i) => {
+                c.classList.toggle('active', i === index);
+            });
+        }
+
+        function setTheme(theme) {
+            document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector('[data-theme="' + theme + '"]').classList.add('selected');
+            currentTheme = themes[theme];
+        }
+
+        document.getElementById('photoInput').onchange = function(e) {
+            if(e.target.files[0]){
+                const r = new FileReader();
+                r.onload = function(ev) { 
+                    document.getElementById('preview').src = ev.target.result; 
+                    document.getElementById('preview').style.display = 'block'; 
+                };
+                r.readAsDataURL(e.target.files[0]);
+            }
+        };
+
+        function addEdu() {
+            const div = document.createElement('div');
+            div.className = 'entry';
+            div.innerHTML = '<label>Degree/Level</label>' +
+                '<input type="text" list="degreeList" placeholder="Start typing..." class="level">' +
+                '<datalist id="degreeList">' +
+                '<option value="10th / SSLC / Matriculation">' +
+                '<option value="12th / HSC / Intermediate - Science">' +
+                '<option value="12th / HSC / Intermediate - Commerce">' +
+                '<option value="12th / HSC / Intermediate - Arts">' +
+                '<option value="Diploma in Engineering">' +
+                '<option value="Diploma in Computer Science">' +
+                '<option value="Bachelor of Arts (B.A.)">' +
+                '<option value="Bachelor of Science (B.Sc.)">' +
+                '<option value="Bachelor of Commerce (B.Com)">' +
+                '<option value="Bachelor of Business Administration (BBA)">' +
+                '<option value="Bachelor of Computer Applications (BCA)">' +
+                '<option value="Bachelor of Technology (B.Tech) - Computer Science">' +
+                '<option value="Bachelor of Technology (B.Tech) - Mechanical">' +
+                '<option value="Bachelor of Technology (B.Tech) - Civil">' +
+                '<option value="Bachelor of Technology (B.Tech) - Electrical">' +
+                '<option value="Bachelor of Technology (B.Tech) - Electronics">' +
+                '<option value="Bachelor of Engineering (B.E.)">' +
+                '<option value="Bachelor of Medicine (MBBS)">' +
+                '<option value="Bachelor of Laws (LLB)">' +
+                '<option value="Master of Arts (M.A.)">' +
+                '<option value="Master of Science (M.Sc.)">' +
+                '<option value="Master of Commerce (M.Com)">' +
+                '<option value="Master of Business Administration (MBA)">' +
+                '<option value="Master of Computer Applications (MCA)">' +
+                '<option value="Master of Technology (M.Tech)">' +
+                '<option value="Doctor of Philosophy (Ph.D.)">' +
+                '<option value="Chartered Accountancy (CA)">' +
+                '</datalist>' +
+                '<label>Institution Name</label>' +
+                '<input type="text" placeholder="School/College name" class="inst">' +
+                '<div class="form-row">' +
+                '<div><label>Year</label><input type="text" placeholder="2020" class="year"></div>' +
+                '<div><label>CGPA/Percentage</label><input type="text" placeholder="85%" class="result"></div>' +
+                '</div>' +
+                '<button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>';
+            document.getElementById('eduContainer').appendChild(div);
+        }
+
+        function addExp() {
+            const div = document.createElement('div');
+            div.className = 'entry';
+            div.innerHTML = '<input type="text" placeholder="Job Title" class="title">' +
+                '<input type="text" placeholder="Company Name" class="company">' +
+                '<input type="text" placeholder="Duration" class="duration">' +
+                '<textarea placeholder="Job description..." class="desc"></textarea>' +
+                '<button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>';
+            document.getElementById('expContainer').appendChild(div);
+        }
+
+        function addCert() {
+            const div = document.createElement('div');
+            div.className = 'entry';
+            div.innerHTML = '<input type="text" placeholder="Certification Name" class="certName">' +
+                '<input type="text" placeholder="Issuing Organization" class="certOrg">' +
+                '<input type="text" placeholder="Year" class="certYear">' +
+                '<button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>';
+            document.getElementById('certContainer').appendChild(div);
+        }
+
+        addEdu();
+        addExp();
+
+        function cleanText(text) {
+            if (!text) return '';
+            return text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
+                       .replace(/[^\x20-\x7E\xA0-\xFF]/g, '')
+                       .trim();
+        }
+
+        function showPreview() {
+            const previewArea = document.getElementById('previewArea');
+            const name = document.getElementById('fullName').innerText.trim();
+            const addr = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const summary = document.getElementById('summary').value;
+            
+            const pc = currentTheme.primary;
+            const colorHex = 'rgb(' + Math.round(pc[0]*255) + ',' + Math.round(pc[1]*255) + ',' + Math.round(pc[2]*255) + ')';
+            
+            let html = '<div style="max-width: 800px; margin: auto; position: relative;">';
+            
+            const photoPreview = document.getElementById('preview');
+            const showPhoto = document.getElementById('showPhoto').checked;
+            if (showPhoto && photoPreview.src && photoPreview.style.display !== 'none') {
+                html += '<img src="' + photoPreview.src + '" style="position: absolute; top: 0; right: 0; width: 100px; height: 120px; border: 4px solid ' + colorHex + '; border-radius: 10px; object-fit: cover;">';
+            }
+            
+            html += '<h1 style="color: ' + colorHex + '; font-size: 32px; margin-bottom: 10px;">' + name + '</h1>';
+            html += '<div style="height: 4px; background: ' + colorHex + '; width: fit-content; margin-bottom: 20px;"></div>';
+            
+            if (addr) html += '<p style="margin: 5px 0;">' + addr + '</p>';
+            if (phone) html += '<p style="margin: 5px 0;">' + phone + '</p>';
+            if (email) html += '<p style="margin: 5px 0;">' + email + '</p>';
+            
+            if (summary && summary.trim()) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">PROFILE SUMMARY</h2>';
+                html += '<p style="margin: 15px 0; line-height: 1.6;">' + summary + '</p>';
+            }
+            
+            const father = document.getElementById('father').value;
+            const mother = document.getElementById('mother').value;
+            const dob = document.getElementById('dob').value;
+            const highest = document.getElementById('highest').value;
+            const relocation = document.getElementById('relocation').value;
+            const notice = document.getElementById('notice').value;
+            
+            if (father || mother || dob || highest) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">BASIC DETAILS</h2>';
+                html += '<ul style="margin: 15px 0; line-height: 1.8;">';
+                if (father) html += '<li>Father\'s Name: ' + father + '</li>';
+                if (mother) html += '<li>Mother\'s Name: ' + mother + '</li>';
+                if (dob) html += '<li>Date of Birth: ' + dob + '</li>';
+                if (highest) html += '<li>Highest Education: ' + highest + '</li>';
+                if (relocation) html += '<li>Available for Relocation: ' + relocation + '</li>';
+                if (notice) html += '<li>Notice Period: ' + notice + '</li>';
+                html += '</ul>';
+            }
+            
+            const eduEntries = document.querySelectorAll('#eduContainer .entry');
+            const hasEdu = Array.from(eduEntries).some(e => e.querySelector('.level').value.trim());
+            if (hasEdu) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">EDUCATION</h2>';
+                html += '<ul style="margin: 15px 0; line-height: 1.8;">';
+                eduEntries.forEach(e => {
+                    const level = e.querySelector('.level').value.trim();
+                    const inst = e.querySelector('.inst').value.trim();
+                    const year = e.querySelector('.year').value.trim();
+                    const result = e.querySelector('.result').value.trim();
+                    if (level) {
+                        html += '<li>' + level;
+                        if (inst) html += ' | ' + inst;
+                        if (year) html += ' | ' + year;
+                        if (result) html += ' | ' + result;
+                        html += '</li>';
+                    }
+                });
+                html += '</ul>';
+            }
+            
+            const expEntries = document.querySelectorAll('#expContainer .entry');
+            const hasExperience = Array.from(expEntries).some(e => e.querySelector('.title').value.trim());
+            if (hasExperience) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">EXPERIENCE</h2>';
+                expEntries.forEach(e => {
+                    const title = e.querySelector('.title').value.trim();
+                    const company = e.querySelector('.company').value.trim();
+                    const duration = e.querySelector('.duration').value.trim();
+                    const desc = e.querySelector('.desc').value.trim();
+                    if (title) {
+                        html += '<div style="margin: 20px 0;">';
+                        html += '<p style="font-weight: bold; margin-bottom: 8px;">' + title;
+                        if (company) html += ' | ' + company;
+                        if (duration) html += ' | ' + duration;
+                        html += '</p>';
+                        if (desc) html += '<p style="margin-left: 20px; line-height: 1.6; color: #333;">' + desc + '</p>';
+                        html += '</div>';
+                    }
+                });
+            }
+            
+            const skills = document.getElementById('skills').value;
+            if (skills && skills.trim()) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">SKILLS</h2>';
+                html += '<ul style="margin: 15px 0; line-height: 1.8;">';
+                skills.split('\n').forEach(s => {
+                    if (s.trim()) html += '<li>' + s.trim() + '</li>';
+                });
+                html += '</ul>';
+            }
+            
+            const certEntries = document.querySelectorAll('#certContainer .entry');
+            const hasCerts = Array.from(certEntries).some(e => e.querySelector('.certName').value.trim());
+            if (hasCerts) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">CERTIFICATIONS</h2>';
+                html += '<ul style="margin: 15px 0; line-height: 1.8;">';
+                certEntries.forEach(e => {
+                    const certName = e.querySelector('.certName').value.trim();
+                    const certOrg = e.querySelector('.certOrg').value.trim();
+                    const certYear = e.querySelector('.certYear').value.trim();
+                    if (certName) {
+                        html += '<li>' + certName;
+                        if (certOrg) html += ' - ' + certOrg;
+                        if (certYear) html += ' (' + certYear + ')';
+                        html += '</li>';
+                    }
+                });
+                html += '</ul>';
+            }
+            
+            const languages = document.getElementById('languages').value;
+            if (languages && languages.trim()) {
+                html += '<h2 style="color: ' + colorHex + '; border-bottom: 2px solid ' + colorHex + '; padding-bottom: 5px; margin-top: 30px;">LANGUAGES</h2>';
+                html += '<ul style="margin: 15px 0; line-height: 1.8;">';
+                languages.split('\n').forEach(l => {
+                    if (l.trim()) html += '<li>' + l.trim() + '</li>';
+                });
+                html += '</ul>';
+            }
+            
+            html += '<p style="margin-top: 40px; font-style: italic;">Declaration: The above information is true to the best of my knowledge.</p>';
+            html += '<p style="text-align: right; font-weight: bold; margin-top: 30px;">' + name + '</p>';
+            
+            html += '</div>';
+            
+            previewArea.innerHTML = html;
+            switchTab(2);
+        }
+
+        async function generatePDF() {
+            document.getElementById('loading').classList.add('show');
+            
+            try {
+                const PDFLib = window.PDFLib;
+                const PDFDocument = PDFLib.PDFDocument;
+                const StandardFonts = PDFLib.StandardFonts;
+                const rgb = PDFLib.rgb;
+                
+                const pdfDoc = await PDFDocument.create();
+                let currentPage = pdfDoc.addPage([595, 842]);
+                
+                const font = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+                const bold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+                const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+                const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+                
+                const size = parseInt(document.getElementById('fontSize').value || 12);
+                const lineHeight = size * 1.5;
+                let y = 760;
+
+                const showPhoto = document.getElementById('showPhoto').checked;
+                const docBorder = document.getElementById('docBorder').value || 'none';
+                const showSectionBoxes = document.getElementById('showSectionBoxes').checked;
+                const showDecoLines = document.getElementById('showDecoLines').checked;
+                const compactMode = document.getElementById('compactMode').checked;
+                const pc = currentTheme.primary;
+
+                function drawBorderOnPage(page) {
+                    if (docBorder === 'simple') {
+                        page.drawRectangle({ x: 30, y: 30, width: 535, height: 782, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+                    } else if (docBorder === 'double') {
+                        page.drawRectangle({ x: 30, y: 30, width: 535, height: 782, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+                        page.drawRectangle({ x: 35, y: 35, width: 525, height: 772, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+                    } else if (docBorder === 'thick') {
+                        page.drawRectangle({ x: 30, y: 30, width: 535, height: 782, borderColor: rgb(pc[0], pc[1], pc[2]), borderWidth: 3 });
+                    } else if (docBorder === 'dashed') {
+                        page.drawRectangle({ x: 30, y: 30, width: 535, height: 782, borderColor: rgb(0, 0, 0), borderWidth: 1, borderDashArray: [5, 3] });
+                    }
+                    
+                    // Add shadow effect to border if enabled
+                    if (showShadowEffect && docBorder !== 'none') {
+                        page.drawRectangle({ x: 33, y: 27, width: 535, height: 782, borderColor: rgb(0.7, 0.7, 0.7), borderWidth: 1, opacity: 0.3 });
+                    }
+                }
+
+                drawBorderOnPage(currentPage);
+
+                function checkPage() {
+                    if (y < 80) {
+                        currentPage = pdfDoc.addPage([595, 842]);
+                        drawBorderOnPage(currentPage);
+                        y = 760;
+                    }
+                }
+
+                if (showPhoto && document.getElementById('photoInput').files[0]) {
+                    try {
+                        const bytes = await document.getElementById('photoInput').files[0].arrayBuffer();
+                        let img;
+                        try {
+                            img = await pdfDoc.embedJpg(bytes);
+                        } catch {
+                            img = await pdfDoc.embedPng(bytes);
+                        }
+                        
+                        const imgWidth = img.width;
+                        const imgHeight = img.height;
+                        const targetWidth = 100;
+                        const targetHeight = 120;
+                        
+                        let drawWidth, drawHeight;
+                        const imgRatio = imgWidth / imgHeight;
+                        const targetRatio = targetWidth / targetHeight;
+                        
+                        if (imgRatio > targetRatio) {
+                            drawWidth = targetWidth;
+                            drawHeight = targetWidth / imgRatio;
+                        } else {
+                            drawHeight = targetHeight;
+                            drawWidth = targetHeight * imgRatio;
+                        }
+                        
+                        const xOffset = (targetWidth - drawWidth) / 2;
+                        const yOffset = (targetHeight - drawHeight) / 2;
+                        
+                        currentPage.drawImage(img, { 
+                            x: 450 + xOffset, 
+                            y: 690 + yOffset, 
+                            width: drawWidth, 
+                            height: drawHeight 
+                        });
+                    } catch(e) { 
+                        console.log("Photo error:", e); 
+                    }
+                }
+
+                let name = cleanText(document.getElementById('fullName').innerText);
+                
+                // Check if user hasn't changed the default name
+                if (name === 'Your Full Name' || !name) {
+                    alert('Please enter your name before generating the CV!');
+                    document.getElementById('loading').classList.remove('show');
+                    return;
+                }
+
+                y -= 3;
+                
+                const nameSize = 32;
+                const nameWidth = helveticaBold.widthOfTextAtSize(name, nameSize);
+                const nameX = 50;
+                
+                // Draw name cleanly without shadow
+                currentPage.drawText(name, { x: nameX, y: y + 10, size: nameSize, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                
+                // Clean professional underline
+                currentPage.drawRectangle({ 
+                    x: nameX, 
+                    y: y - 8, 
+                    width: nameWidth, 
+                    height: 4, 
+                    color: rgb(pc[0], pc[1], pc[2])
+                });
+                y -= 55;
+
+                const addr = cleanText(document.getElementById('address').value);
+                const phone = cleanText(document.getElementById('phone').value);
+                const email = cleanText(document.getElementById('email').value);
+                
+                // Contact info with icons simulation
+                if(addr) { 
+                    currentPage.drawText('|', { x: 55, y: y, size: size + 2, font: bold, color: rgb(pc[0], pc[1], pc[2]) });
+                    currentPage.drawText(addr, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                    y -= lineHeight; 
+                }
+                if(phone) { 
+                    currentPage.drawText('|', { x: 55, y: y, size: size + 2, font: bold, color: rgb(pc[0], pc[1], pc[2]) });
+                    currentPage.drawText(phone, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                    y -= lineHeight; 
+                }
+                if(email) { 
+                    currentPage.drawText('|', { x: 55, y: y, size: size + 2, font: bold, color: rgb(pc[0], pc[1], pc[2]) });
+                    currentPage.drawText(email, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                    y -= lineHeight; 
+                }
+                y -= (compactMode ? 20 : 30);
+
+                if (showDecoLines) {
+                    checkPage();
+                    currentPage.drawLine({ start: { x: 50, y: y }, end: { x: 545, y: y }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
+                    y -= (compactMode ? 15 : 25);
+                } else {
+                    y -= 10;
+                }
+
+                function drawWrappedText(text, x, maxWidth) {
+                    const words = text.split(' ');
+                    let line = '';
+                    
+                    for (let word of words) {
+                        const testLine = line + word + ' ';
+                        const width = font.widthOfTextAtSize(testLine, size);
+                        
+                        if (width > maxWidth && line !== '') {
+                            checkPage();
+                            currentPage.drawText(line.trim(), { x: x, y: y, size: size, font: font });
+                            line = word + ' ';
+                            y -= lineHeight;
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    
+                    if (line.trim()) {
+                        checkPage();
+                        currentPage.drawText(line.trim(), { x: x, y: y, size: size, font: font });
+                        y -= lineHeight;
+                    }
+                }
+
+                const summary = cleanText(document.getElementById('summary').value);
+                if(summary) {
+                    checkPage();
+                    
+                    // Clean section header
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('PROFILE SUMMARY', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    // Clean underline
+                    const headerWidth = helveticaBold.widthOfTextAtSize('PROFILE SUMMARY', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    drawWrappedText(summary, 70, 480);
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                const father = cleanText(document.getElementById('father').value);
+                const mother = cleanText(document.getElementById('mother').value);
+                const dob = cleanText(document.getElementById('dob').value);
+                const highest = cleanText(document.getElementById('highest').value);
+                const relocation = cleanText(document.getElementById('relocation').value);
+                const notice = cleanText(document.getElementById('notice').value);
+
+                if(father || mother || dob || highest) {
+                    checkPage();
+                    
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('BASIC DETAILS', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    const headerWidth = helveticaBold.widthOfTextAtSize('BASIC DETAILS', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    if(father) { checkPage(); currentPage.drawText('• Father\'s Name: ' + father, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    if(mother) { checkPage(); currentPage.drawText('• Mother\'s Name: ' + mother, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    if(dob) { checkPage(); currentPage.drawText('• Date of Birth: ' + dob, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    if(highest) { checkPage(); currentPage.drawText('• Highest Education: ' + highest, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    if(relocation) { checkPage(); currentPage.drawText('• Available for Relocation: ' + relocation, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    if(notice) { checkPage(); currentPage.drawText('• Notice Period: ' + notice, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); y -= lineHeight; }
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                const eduEntries = document.querySelectorAll('#eduContainer .entry');
+                const hasEdu = Array.from(eduEntries).some(function(e) { return e.querySelector('.level').value.trim(); });
+                
+                if(hasEdu) {
+                    checkPage();
+                    
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('EDUCATION', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    const headerWidth = helveticaBold.widthOfTextAtSize('EDUCATION', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    eduEntries.forEach(function(e) {
+                        const level = cleanText(e.querySelector('.level').value);
+                        const inst = cleanText(e.querySelector('.inst').value);
+                        const year = cleanText(e.querySelector('.year').value || '');
+                        const result = cleanText(e.querySelector('.result').value);
+                        if(level) {
+                            let txt = '• ' + level;
+                            if(inst) txt += ' | ' + inst;
+                            if(year) txt += ' | ' + year;
+                            if(result) txt += ' | ' + result;
+                            checkPage();
+                            currentPage.drawText(txt, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                            y -= lineHeight;
+                        }
+                    });
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                const expEntries = document.querySelectorAll('#expContainer .entry');
+                const hasExperience = Array.from(expEntries).some(function(e) { return e.querySelector('.title').value.trim(); });
+                
+                if(hasExperience) {
+                    checkPage();
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    currentPage.drawText('EXPERIENCE', { x: (showSectionBoxes ? 55 : 50), y: y, size: 14, font: bold, color: rgb(pc[0], pc[1], pc[2]) });
+                    // Add underline under section header
+                    const headerWidth = bold.widthOfTextAtSize('EXPERIENCE', 14);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2]) 
+                    });
+                    y -= (compactMode ? 20 : 25);
+                    
+                    for (let i = 0; i < expEntries.length; i++) {
+                        const e = expEntries[i];
+                        const title = cleanText(e.querySelector('.title').value);
+                        const company = cleanText(e.querySelector('.company').value);
+                        const duration = cleanText(e.querySelector('.duration').value);
+                        const desc = cleanText(e.querySelector('.desc').value);
+                        
+                        if(title) {
+                            checkPage();
+                            let header = '- ' + title;
+                            if(company) header += ' | ' + company;
+                            if(duration) header += ' | ' + duration;
+                            currentPage.drawText(header, { x: 70, y: y, size: size, font: bold }); 
+                            y -= lineHeight + 3;
+                            
+                            if(desc) {
+                                // Draw description as paragraph without splitting
+                                drawWrappedText(desc, 85, 460);
+                                y -= (compactMode ? 8 : 12);
+                            }
+                        }
+                    }
+                    y -= (compactMode ? 8 : 10);
+                }
+
+                const skills = document.getElementById('skills').value;
+                if(skills && skills.trim()) {
+                    checkPage();
+                    
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('SKILLS', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    const headerWidth = helveticaBold.widthOfTextAtSize('SKILLS', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    
+                    const skillLines = skills.split('\n');
+                    for(let i = 0; i < skillLines.length; i++) {
+                        const skillText = skillLines[i].trim();
+                        if (skillText) { 
+                            checkPage();
+                            const cleanedSkill = cleanText(skillText);
+                            if(cleanedSkill) {
+                                currentPage.drawText('• ' + cleanedSkill, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                                y -= lineHeight;
+                            }
+                        }
+                    }
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                const certEntries = document.querySelectorAll('#certContainer .entry');
+                const hasCerts = Array.from(certEntries).some(function(e) { return e.querySelector('.certName').value.trim(); });
+                
+                if(hasCerts) {
+                    checkPage();
+                    
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('CERTIFICATIONS', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    const headerWidth = helveticaBold.widthOfTextAtSize('CERTIFICATIONS', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    certEntries.forEach(function(e) {
+                        const certName = cleanText(e.querySelector('.certName').value);
+                        const certOrg = cleanText(e.querySelector('.certOrg').value);
+                        const certYear = cleanText(e.querySelector('.certYear').value);
+                        if(certName) {
+                            checkPage();
+                            let txt = '• ' + certName;
+                            if(certOrg) txt += ' - ' + certOrg;
+                            if(certYear) txt += ' (' + certYear + ')';
+                            currentPage.drawText(txt, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                            y -= lineHeight;
+                        }
+                    });
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                const languages = document.getElementById('languages').value;
+                if(languages && languages.trim()) {
+                    checkPage();
+                    
+                    if (showSectionBoxes) {
+                        currentPage.drawRectangle({ x: 45, y: y - 5, width: 5, height: 20, color: rgb(pc[0], pc[1], pc[2]) });
+                    }
+                    
+                    currentPage.drawText('LANGUAGES', { x: (showSectionBoxes ? 55 : 50), y: y, size: 15, font: helveticaBold, color: rgb(pc[0], pc[1], pc[2]) });
+                    
+                    const headerWidth = helveticaBold.widthOfTextAtSize('LANGUAGES', 15);
+                    currentPage.drawLine({ 
+                        start: { x: (showSectionBoxes ? 55 : 50), y: y - 3 }, 
+                        end: { x: (showSectionBoxes ? 55 : 50) + headerWidth, y: y - 3 }, 
+                        thickness: 2, 
+                        color: rgb(pc[0], pc[1], pc[2])
+                    });
+                    
+                    y -= 28;
+                    
+                    const langLines = languages.split('\n');
+                    for(let i = 0; i < langLines.length; i++) {
+                        const langText = langLines[i].trim();
+                        if (langText) { 
+                            checkPage();
+                            const cleanedLang = cleanText(langText);
+                            if(cleanedLang) {
+                                currentPage.drawText('• ' + cleanedLang, { x: 70, y: y, size: size, font: font, color: rgb(0.2, 0.2, 0.2) }); 
+                                y -= lineHeight;
+                            }
+                        }
+                    }
+                    y -= (compactMode ? 15 : 20);
+                }
+
+                checkPage();
+                y -= (compactMode ? 20 : 30);
+                if (showDecoLines) {
+                    currentPage.drawLine({ start: { x: 50, y: y }, end: { x: 545, y: y }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
+                    y -= 20;
+                }
+                currentPage.drawText('Declaration: The above information is true to the best of my knowledge.', { x: 50, y: y, size: size - 1, font: font });
+                y -= 40;
+                currentPage.drawText('Signature:', { x: 50, y: y, size: 11, font: font });
+                currentPage.drawText(name, { x: 380, y: y, size: 14, font: bold });
+                currentPage.drawLine({ start: { x: 380, y: y - 5 }, end: { x: 480, y: y - 5 }, thickness: 0.5, color: rgb(0, 0, 0) });
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name.replace(/ /g, '_') + '_CV_Professional.pdf';
+                a.click();
+                
+                setTimeout(function() { 
+                    document.getElementById('loading').classList.remove('show'); 
+                }, 500);
+            } catch(error) {
+                alert('Error generating PDF: ' + error.message);
+                console.error(error);
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
