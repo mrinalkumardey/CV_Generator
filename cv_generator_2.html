@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Professional CV Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -30,11 +31,14 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            flex: 1;
         }
         
         header {
@@ -62,6 +66,7 @@
             display: flex;
             gap: 25px;
             flex-wrap: wrap;
+            margin-bottom: 40px;
         }
         
         .form-container {
@@ -329,6 +334,32 @@
             flex: 1;
             min-width: 200px;
         }
+
+        /* Footer styles for the generator page */
+        .page-footer {
+            margin-top: auto;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--secondary-color);
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .footer-link {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
         
         /* Print-specific styles */
         @media print {
@@ -359,7 +390,7 @@
             .cv-section {
                 page-break-inside: avoid;
             }
-            .action-buttons, .form-container, header {
+            .action-buttons, .form-container, header, .page-footer {
                 display: none;
             }
         }
@@ -413,6 +444,25 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        #loadingOverlay.show {
+            display: flex;
         }
     </style>
 </head>
@@ -563,6 +613,20 @@
                 </div>
             </div>
         </div>
+
+        <!-- Page Footer (only for the generator, not in CV) -->
+        <div class="page-footer">
+            <p class="footer-text">Developed by Mrinal Kumar</p>
+            <p class="footer-text">
+                Connect with me on 
+                <a href="https://www.linkedin.com/in/mrinal-kumar" target="_blank" class="footer-link">LinkedIn</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="loadingOverlay">
+        <div class="loading"></div>
+        <p>Generating PDF...</p>
     </div>
 
     <script>
@@ -581,6 +645,7 @@
         const exportPDFBtn = document.getElementById('exportPDF');
         const sendCVBtn = document.getElementById('sendCV');
         const statusMessage = document.getElementById('statusMessage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
         // Education elements
         const sscSchoolInput = document.getElementById('sscSchool');
@@ -900,6 +965,9 @@
 
         // Print CV
         function printCV() {
+            // First update preview to ensure we have latest content
+            updatePreview();
+            
             // Create a print-friendly version
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
@@ -908,22 +976,106 @@
                 <head>
                     <title>${fullNameInput.value || 'My CV'}</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
-                        .cv-header { background: #2c3e50; color: white; padding: 30px; text-align: center; margin-bottom: 25px; }
-                        .cv-name { font-size: 2.5rem; margin-bottom: 10px; }
-                        .cv-contact { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 15px; }
-                        .cv-section { margin-bottom: 25px; }
-                        .cv-section-title { font-size: 1.4rem; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-bottom: 15px; }
-                        .cv-item { margin-bottom: 20px; padding-left: 20px; position: relative; }
-                        .cv-item:before { content: "•"; color: #e74c3c; font-size: 1.5rem; position: absolute; left: 0; top: 0; }
-                        .cv-item-title { font-weight: 600; font-size: 1.1rem; color: #34495e; }
-                        .cv-item-subtitle { color: #666; margin-bottom: 5px; font-style: italic; }
-                        .cv-item-date { color: #777; font-size: 0.9rem; margin-bottom: 8px; }
-                        .cv-item-description { font-family: 'Georgia', serif; font-size: 0.95rem; color: #555; }
-                        .cv-skills { display: flex; flex-wrap: wrap; gap: 10px; padding-left: 20px; }
-                        .skill-tag { background: #3498db; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; position: relative; padding-left: 30px; }
-                        .skill-tag:before { content: "✓"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: bold; }
-                        @media print { body { padding: 0; } .cv-section { page-break-inside: avoid; } }
+                        body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                            color: #333; 
+                            line-height: 1.6; 
+                            max-width: 800px; 
+                            margin: 0 auto; 
+                            padding: 20px;
+                        }
+                        .cv-header { 
+                            background: #2c3e50; 
+                            color: white; 
+                            padding: 30px; 
+                            text-align: center; 
+                            margin-bottom: 25px; 
+                        }
+                        .cv-name { 
+                            font-size: 2.5rem; 
+                            margin-bottom: 10px; 
+                        }
+                        .cv-contact { 
+                            display: flex; 
+                            justify-content: center; 
+                            flex-wrap: wrap; 
+                            gap: 20px; 
+                            margin-top: 15px; 
+                        }
+                        .cv-section { 
+                            margin-bottom: 25px; 
+                        }
+                        .cv-section-title { 
+                            font-size: 1.4rem; 
+                            color: #2c3e50; 
+                            border-bottom: 2px solid #3498db; 
+                            padding-bottom: 8px; 
+                            margin-bottom: 15px; 
+                        }
+                        .cv-item { 
+                            margin-bottom: 20px; 
+                            padding-left: 20px; 
+                            position: relative; 
+                        }
+                        .cv-item:before { 
+                            content: "•"; 
+                            color: #e74c3c; 
+                            font-size: 1.5rem; 
+                            position: absolute; 
+                            left: 0; 
+                            top: 0; 
+                        }
+                        .cv-item-title { 
+                            font-weight: 600; 
+                            font-size: 1.1rem; 
+                            color: #34495e; 
+                        }
+                        .cv-item-subtitle { 
+                            color: #666; 
+                            margin-bottom: 5px; 
+                            font-style: italic; 
+                        }
+                        .cv-item-date { 
+                            color: #777; 
+                            font-size: 0.9rem; 
+                            margin-bottom: 8px; 
+                        }
+                        .cv-item-description { 
+                            font-family: 'Georgia', serif; 
+                            font-size: 0.95rem; 
+                            color: #555; 
+                        }
+                        .cv-skills { 
+                            display: flex; 
+                            flex-wrap: wrap; 
+                            gap: 10px; 
+                            padding-left: 20px; 
+                        }
+                        .skill-tag { 
+                            background: #3498db; 
+                            color: white; 
+                            padding: 8px 15px; 
+                            border-radius: 20px; 
+                            font-size: 0.9rem; 
+                            position: relative; 
+                            padding-left: 30px; 
+                        }
+                        .skill-tag:before { 
+                            content: "✓"; 
+                            position: absolute; 
+                            left: 12px; 
+                            top: 50%; 
+                            transform: translateY(-50%); 
+                            font-weight: bold; 
+                        }
+                        @media print { 
+                            body { 
+                                padding: 0; 
+                            } 
+                            .cv-section { 
+                                page-break-inside: avoid; 
+                            }
+                        }
                     </style>
                 </head>
                 <body>
@@ -942,9 +1094,44 @@
             };
         }
 
-        // Export as PDF
+        // Export as PDF - SIMPLIFIED AND FIXED
         function exportPDF() {
-            showStatus('PDF export would be implemented here!', 'success');
+            // Show loading overlay
+            loadingOverlay.classList.add('show');
+            
+            // Use html2canvas to capture the preview container directly
+            html2canvas(cvPreview, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Add image to PDF
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                
+                // Download the PDF
+                const fileName = (fullNameInput.value || 'CV').replace(/\s+/g, '_') + '_Professional_CV.pdf';
+                pdf.save(fileName);
+                
+                // Hide loading overlay
+                loadingOverlay.classList.remove('show');
+                showStatus('PDF exported successfully!', 'success');
+                
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                loadingOverlay.classList.remove('show');
+                showStatus('Error generating PDF. Please try again.', 'error');
+            });
         }
 
         // Send CV
